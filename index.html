@@ -38,7 +38,7 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#f5f6f
 .sel{padding:5px 10px;border:1px solid #e4e6ef;border-radius:6px;font-size:11.5px;background:#fff;color:#374151;cursor:pointer;font-family:inherit;outline:none}
 .sel:focus{border-color:#2563eb;box-shadow:0 0 0 2px rgba(37,99,235,.1)}
 /* ── Grid ── */
-.grid-wrap{overflow:auto;border:1px solid #e4e6ef;border-radius:8px;max-height:500px}
+.grid-wrap{overflow-x:auto;overflow-y:visible;border:1px solid #e4e6ef;border-radius:8px;max-height:none}
 .dg{border-collapse:collapse;font-size:11px;min-width:100%;background:#fff}
 .dg th{background:#f8fafc;border-bottom:2px solid #e2e8f0;border-right:1px solid #eaecf0;padding:7px 10px;text-align:right;font-weight:600;color:#374151;white-space:nowrap;position:sticky;top:0;z-index:2}
 .dg th.lc{text-align:left;position:sticky;top:0;left:0;z-index:3;background:#f8fafc;border-right:2px solid #e2e8f0;min-width:180px}
@@ -898,13 +898,25 @@ function RetailEngineTab(){
       )
     ),
 
-    /* ── 1. Actual vs Predicted grid ── */
+    /* ── 1. Prediction Grid — State × Model tree ── */
+    filtMos.length>0&&predGroups.length>0&&ce('div',{className:'card'},
+      ce('div',{className:'card-hdr'},
+        ce('div',{className:'card-title'},
+          'Prediction Grid — State × Model × Month'+(selState!=='All'?' · '+selState:' · Pan India')),
+        ce(ExportBtn,{onClick:doExportPredGrid})
+      ),
+      ce('div',{style:{fontSize:11,color:'#94a3b8',marginBottom:10}},
+        'Click a state row to expand/collapse models. State row = VAHAN actual for that state (allocation error = 0). Signals: WS Share 30% · Lead Affinity 33% · SIAM Supply 20% · Momentum 17% × Lead Quality.'),
+      ce(TreeGrid,{groups:predGroups,cols:predCols,footerLabel:'State / Model',initExpanded:false})
+    ),
+
+    /* ── 2. Actual vs Predicted grid ── */
     filtMos.length>0&&ce('div',{className:'card'},
       ce('div',{className:'card-hdr'},
         ce('div',{className:'card-title'},'Actual vs Predicted — Month by Month'),
         ce(ExportBtn,{onClick:doExportAccuracy})
       ),
-      ce('div',{className:'grid-wrap',style:{maxHeight:300}},
+      ce('div',{className:'grid-wrap'},
         ce('table',{className:'dg'},
           ce('thead',null,ce('tr',null,
             ce('th',{className:'lc',style:{minWidth:90}},'Month'),
@@ -940,24 +952,12 @@ function RetailEngineTab(){
       )
     ),
 
-    /* ── 2. Prediction Grid — State × Model tree ── */
-    filtMos.length>0&&predGroups.length>0&&ce('div',{className:'card'},
-      ce('div',{className:'card-hdr'},
-        ce('div',{className:'card-title'},
-          'Prediction Grid — State × Model × Month'+(selState!=='All'?' · '+selState:' · Pan India')),
-        ce(ExportBtn,{onClick:doExportPredGrid})
-      ),
-      ce('div',{style:{fontSize:11,color:'#94a3b8',marginBottom:10}},
-        'Click a state row to expand/collapse models. State row = VAHAN actual for that state (allocation error = 0). Signals: WS Share 30% · Lead Affinity 33% · SIAM Supply 20% · Momentum 17% × Lead Quality.'),
-      ce(TreeGrid,{groups:predGroups,cols:predCols,footerLabel:'State / Model',initExpanded:false})
-    ),
-
     /* ── 3. State Momentum Overview ── */
     selState==='All'&&filtMos.length>1&&ce('div',{className:'card'},
       ce('div',{className:'card-title'},'State Momentum Overview — TVS Vahan Retails MoM % — Pan India'),
       ce('div',{style:{fontSize:11,color:'#94a3b8',marginBottom:10}},
         'Month-on-month growth in TVS state retails. Positive = improving momentum (Signal 1 in prediction).'),
-      ce('div',{className:'grid-wrap',style:{maxHeight:380}},
+      ce('div',{className:'grid-wrap'},
         ce('table',{className:'dg'},
           ce('thead',null,ce('tr',null,
             ce('th',{className:'lc'},'State'),
