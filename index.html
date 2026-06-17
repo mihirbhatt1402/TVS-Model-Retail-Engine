@@ -95,12 +95,69 @@ const HMSI_WS_ROWS=HMSI_WS_RAW.map(function(d){return{model:d.mod,month:d.mo,who
 /* HMSI Org rows: Honda organic leads (Pan India) — no state column in source */
 const HMSI_ORG_ROWS=HMSI_ORG_RAW.map(function(d){return{model:d.mod,month:d.mo,state:'Pan India',generation:d.g,lead_type:'Organic'};});
 
+/* ── SIAM STATE-WISE OEM WHOLESALE (Quarterly, TVS Motor Company) ─── */
+/* Source: TVS StateWise OEM Wholesale - Quaterly.xlsx — Scooters+Motorcycle+Moped summed per state */
+const MRE_STATE_WS=[
+  {q:'Q1-FY2025',st:'Delhi',ws:24344},{q:'Q1-FY2025',st:'Haryana',ws:14830},{q:'Q1-FY2025',st:'Punjab',ws:23090},{q:'Q1-FY2025',st:'Uttar Pradesh',ws:133748},
+  {q:'Q1-FY2025',st:'Assam',ws:40227},{q:'Q1-FY2025',st:'Bihar',ws:56466},{q:'Q1-FY2025',st:'Jharkhand',ws:25820},{q:'Q1-FY2025',st:'Odisha',ws:29598},{q:'Q1-FY2025',st:'West Bengal',ws:53446},
+  {q:'Q1-FY2025',st:'Chhattisgarh',ws:17640},{q:'Q1-FY2025',st:'Gujarat',ws:29967},{q:'Q1-FY2025',st:'Madhya Pradesh',ws:44670},{q:'Q1-FY2025',st:'Maharashtra',ws:66988},{q:'Q1-FY2025',st:'Rajasthan',ws:37257},
+  {q:'Q1-FY2025',st:'Andhra Pradesh',ws:23597},{q:'Q1-FY2025',st:'Karnataka',ws:63844},{q:'Q1-FY2025',st:'Kerala',ws:24204},{q:'Q1-FY2025',st:'Tamil Nadu',ws:94632},{q:'Q1-FY2025',st:'Telangana',ws:23955},
+  {q:'Q2-FY2025',st:'Delhi',ws:32696},{q:'Q2-FY2025',st:'Haryana',ws:20233},{q:'Q2-FY2025',st:'Punjab',ws:30675},{q:'Q2-FY2025',st:'Uttar Pradesh',ws:135422},
+  {q:'Q2-FY2025',st:'Assam',ws:38405},{q:'Q2-FY2025',st:'Bihar',ws:47714},{q:'Q2-FY2025',st:'Jharkhand',ws:24718},{q:'Q2-FY2025',st:'Odisha',ws:29229},{q:'Q2-FY2025',st:'West Bengal',ws:50160},
+  {q:'Q2-FY2025',st:'Chhattisgarh',ws:19866},{q:'Q2-FY2025',st:'Gujarat',ws:35049},{q:'Q2-FY2025',st:'Madhya Pradesh',ws:51834},{q:'Q2-FY2025',st:'Maharashtra',ws:82405},{q:'Q2-FY2025',st:'Rajasthan',ws:51883},
+  {q:'Q2-FY2025',st:'Andhra Pradesh',ws:28105},{q:'Q2-FY2025',st:'Karnataka',ws:68641},{q:'Q2-FY2025',st:'Kerala',ws:34949},{q:'Q2-FY2025',st:'Tamil Nadu',ws:100064},{q:'Q2-FY2025',st:'Telangana',ws:30413},
+  {q:'Q3-FY2025',st:'Chandigarh',ws:61},{q:'Q3-FY2025',st:'Delhi',ws:31802},{q:'Q3-FY2025',st:'Haryana',ws:17803},{q:'Q3-FY2025',st:'Jammu and Kashmir',ws:16},{q:'Q3-FY2025',st:'Punjab',ws:25418},{q:'Q3-FY2025',st:'Uttar Pradesh',ws:149098},{q:'Q3-FY2025',st:'Uttarakhand',ws:439},
+  {q:'Q3-FY2025',st:'Andaman and Nicobar Islands',ws:6},{q:'Q3-FY2025',st:'Assam',ws:33930},{q:'Q3-FY2025',st:'Bihar',ws:53580},{q:'Q3-FY2025',st:'Jharkhand',ws:24953},{q:'Q3-FY2025',st:'Manipur',ws:5},{q:'Q3-FY2025',st:'Mizoram',ws:35},{q:'Q3-FY2025',st:'Odisha',ws:30575},{q:'Q3-FY2025',st:'Tripura',ws:9},{q:'Q3-FY2025',st:'West Bengal',ws:47521},
+  {q:'Q3-FY2025',st:'Chhattisgarh',ws:23031},{q:'Q3-FY2025',st:'Goa',ws:178},{q:'Q3-FY2025',st:'Gujarat',ws:35891},{q:'Q3-FY2025',st:'Madhya Pradesh',ws:58823},{q:'Q3-FY2025',st:'Maharashtra',ws:100663},{q:'Q3-FY2025',st:'Rajasthan',ws:40189},
+  {q:'Q3-FY2025',st:'Andhra Pradesh',ws:26862},{q:'Q3-FY2025',st:'Karnataka',ws:70404},{q:'Q3-FY2025',st:'Kerala',ws:26136},{q:'Q3-FY2025',st:'Puducherry',ws:344},{q:'Q3-FY2025',st:'Tamil Nadu',ws:82483},{q:'Q3-FY2025',st:'Telangana',ws:29403},
+  {q:'Q4-FY2025',st:'Delhi',ws:29073},{q:'Q4-FY2025',st:'Haryana',ws:14261},{q:'Q4-FY2025',st:'Punjab',ws:23112},{q:'Q4-FY2025',st:'Uttar Pradesh',ws:125822},
+  {q:'Q4-FY2025',st:'Assam',ws:37670},{q:'Q4-FY2025',st:'Bihar',ws:43870},{q:'Q4-FY2025',st:'Jharkhand',ws:24035},{q:'Q4-FY2025',st:'Odisha',ws:35436},{q:'Q4-FY2025',st:'West Bengal',ws:44820},
+  {q:'Q4-FY2025',st:'Chhattisgarh',ws:18969},{q:'Q4-FY2025',st:'Gujarat',ws:31149},{q:'Q4-FY2025',st:'Madhya Pradesh',ws:42000},{q:'Q4-FY2025',st:'Maharashtra',ws:96165},{q:'Q4-FY2025',st:'Rajasthan',ws:27428},
+  {q:'Q4-FY2025',st:'Andhra Pradesh',ws:28990},{q:'Q4-FY2025',st:'Karnataka',ws:71261},{q:'Q4-FY2025',st:'Kerala',ws:31362},{q:'Q4-FY2025',st:'Tamil Nadu',ws:114062},{q:'Q4-FY2025',st:'Telangana',ws:28098},
+  {q:'Q1-FY2026',st:'Delhi',ws:32042},{q:'Q1-FY2026',st:'Haryana',ws:17592},{q:'Q1-FY2026',st:'Punjab',ws:27251},{q:'Q1-FY2026',st:'Uttar Pradesh',ws:164442},
+  {q:'Q1-FY2026',st:'Assam',ws:32461},{q:'Q1-FY2026',st:'Bihar',ws:60754},{q:'Q1-FY2026',st:'Jharkhand',ws:32517},{q:'Q1-FY2026',st:'Odisha',ws:35301},{q:'Q1-FY2026',st:'West Bengal',ws:49823},
+  {q:'Q1-FY2026',st:'Chhattisgarh',ws:18555},{q:'Q1-FY2026',st:'Gujarat',ws:35818},{q:'Q1-FY2026',st:'Madhya Pradesh',ws:46414},{q:'Q1-FY2026',st:'Maharashtra',ws:77410},{q:'Q1-FY2026',st:'Rajasthan',ws:33618},
+  {q:'Q1-FY2026',st:'Andhra Pradesh',ws:25523},{q:'Q1-FY2026',st:'Karnataka',ws:68742},{q:'Q1-FY2026',st:'Kerala',ws:28841},{q:'Q1-FY2026',st:'Tamil Nadu',ws:98262},{q:'Q1-FY2026',st:'Telangana',ws:28580},
+  {q:'Q2-FY2026',st:'Delhi',ws:45857},{q:'Q2-FY2026',st:'Haryana',ws:25296},{q:'Q2-FY2026',st:'Punjab',ws:36911},{q:'Q2-FY2026',st:'Uttar Pradesh',ws:159217},
+  {q:'Q2-FY2026',st:'Assam',ws:38339},{q:'Q2-FY2026',st:'Bihar',ws:58152},{q:'Q2-FY2026',st:'Jharkhand',ws:33293},{q:'Q2-FY2026',st:'Odisha',ws:39838},{q:'Q2-FY2026',st:'West Bengal',ws:50617},
+  {q:'Q2-FY2026',st:'Chhattisgarh',ws:22235},{q:'Q2-FY2026',st:'Gujarat',ws:51721},{q:'Q2-FY2026',st:'Madhya Pradesh',ws:61037},{q:'Q2-FY2026',st:'Maharashtra',ws:109600},{q:'Q2-FY2026',st:'Rajasthan',ws:55753},
+  {q:'Q2-FY2026',st:'Andhra Pradesh',ws:39815},{q:'Q2-FY2026',st:'Karnataka',ws:82156},{q:'Q2-FY2026',st:'Kerala',ws:39633},{q:'Q2-FY2026',st:'Tamil Nadu',ws:103607},{q:'Q2-FY2026',st:'Telangana',ws:37784},
+  {q:'Q3-FY2026',st:'Delhi',ws:39246},{q:'Q3-FY2026',st:'Haryana',ws:22258},{q:'Q3-FY2026',st:'Punjab',ws:32132},{q:'Q3-FY2026',st:'Uttar Pradesh',ws:185429},
+  {q:'Q3-FY2026',st:'Assam',ws:35163},{q:'Q3-FY2026',st:'Bihar',ws:67175},{q:'Q3-FY2026',st:'Jharkhand',ws:35709},{q:'Q3-FY2026',st:'Odisha',ws:40361},{q:'Q3-FY2026',st:'West Bengal',ws:55530},
+  {q:'Q3-FY2026',st:'Chhattisgarh',ws:24373},{q:'Q3-FY2026',st:'Gujarat',ws:47205},{q:'Q3-FY2026',st:'Madhya Pradesh',ws:62528},{q:'Q3-FY2026',st:'Maharashtra',ws:112753},{q:'Q3-FY2026',st:'Rajasthan',ws:46878},
+  {q:'Q3-FY2026',st:'Andhra Pradesh',ws:31434},{q:'Q3-FY2026',st:'Karnataka',ws:83382},{q:'Q3-FY2026',st:'Kerala',ws:35328},{q:'Q3-FY2026',st:'Tamil Nadu',ws:129521},{q:'Q3-FY2026',st:'Telangana',ws:31196},
+  {q:'Q4-FY2026',st:'Delhi',ws:38464},{q:'Q4-FY2026',st:'Haryana',ws:19256},{q:'Q4-FY2026',st:'Punjab',ws:30975},{q:'Q4-FY2026',st:'Uttar Pradesh',ws:155125},
+  {q:'Q4-FY2026',st:'Assam',ws:38776},{q:'Q4-FY2026',st:'Bihar',ws:54436},{q:'Q4-FY2026',st:'Jharkhand',ws:30189},{q:'Q4-FY2026',st:'Odisha',ws:42996},{q:'Q4-FY2026',st:'West Bengal',ws:51881},
+  {q:'Q4-FY2026',st:'Chhattisgarh',ws:22680},{q:'Q4-FY2026',st:'Gujarat',ws:47986},{q:'Q4-FY2026',st:'Madhya Pradesh',ws:54215},{q:'Q4-FY2026',st:'Maharashtra',ws:119589},{q:'Q4-FY2026',st:'Rajasthan',ws:38367},
+  {q:'Q4-FY2026',st:'Andhra Pradesh',ws:40430},{q:'Q4-FY2026',st:'Karnataka',ws:99063},{q:'Q4-FY2026',st:'Kerala',ws:44352},{q:'Q4-FY2026',st:'Tamil Nadu',ws:155253},{q:'Q4-FY2026',st:'Telangana',ws:37083},
+];
 
 /* ── UTILS ───────────────────────────────────────────────────────── */
 function moKey(s){var p=String(s||'').split("'");if(p.length===2){var i=MN.indexOf(p[0]);if(i>=0)return parseInt('20'+p[1])*12+i;}return -1;}
 function Nf(n){return n?(Number(n)||0).toLocaleString('en-IN'):'-';}
 function Nfw(n){return (Number(n)||0).toLocaleString('en-IN');}
 function clamp01(v){return Math.max(0,Math.min(1,isFinite(v)?v:0));}
+/* Map a month label (e.g. "Apr'25") to its SIAM fiscal quarter (e.g. "Q1-FY2026") */
+function moToQuarter(mo){
+  var p=mo.match(/(\w+)'(\d+)/);if(!p)return null;
+  var idx=MN.indexOf(p[1]),yr=parseInt(p[2]);
+  var fy=(idx>=3)?(2000+yr+1):(2000+yr);
+  var q=(idx>=3&&idx<=5)?1:(idx>=6&&idx<=8)?2:(idx>=9)?3:4;
+  return 'Q'+q+'-FY'+fy;
+}
+/* Static lead-quality defaults by model name (fuzzy match) */
+function getStaticQm(model){
+  var u=(model||'').toUpperCase();
+  if(u.indexOf('IQUBE')>=0||u.indexOf('I QUBE')>=0)return 1.45;
+  if(u.indexOf('XL100')>=0||u.indexOf('XL 100')>=0)return 1.50;
+  if(u.indexOf('JUPITER')>=0)return 1.25;
+  if(u.indexOf('SCOOTY')>=0)return 1.20;
+  if(u.indexOf('NTORQ')>=0)return 1.00;
+  if(u.indexOf('APACHE RR')>=0||u.indexOf('RR 310')>=0)return 0.80;
+  if(u.indexOf('APACHE')>=0||u.indexOf('RTR')>=0)return 0.95;
+  if(u.indexOf('RADEON')>=0||u.indexOf('SPORT')>=0)return 1.20;
+  return 1.00;
+}
 function mkChart(ref,id,cfg){
   var c=document.getElementById(id);if(!c)return;
   if(ref.current){try{ref.current.destroy();}catch(e){}ref.current=null;}
@@ -507,11 +564,22 @@ function RetailEngineTab(){
     return o;
   },[]);
 
+  /* SIAM state wholesale: swAgg[state][quarter]=ws, swTotalByQ[quarter]=Σ_states ws */
+  var swAgg=useMemo(function(){
+    var o={};
+    MRE_STATE_WS.forEach(function(d){if(!o[d.st])o[d.st]={};o[d.st][d.q]=(o[d.st][d.q]||0)+d.ws;});
+    return o;
+  },[]);
+  var swTotalByQ=useMemo(function(){
+    var o={};
+    MRE_STATE_WS.forEach(function(d){o[d.q]=(o[d.q]||0)+d.ws;});
+    return o;
+  },[]);
+
   var allStates=useMemo(function(){return Object.keys(vhnAgg).filter(function(s){return s!=='__ALL__';}).sort();},[vhnAgg]);
   var allModels=useMemo(function(){var s={};Object.keys(wsAgg).forEach(function(m){s[m]=1;});ORG_ROWS.forEach(function(r){s[r.model]=1;});return Object.keys(s).sort();},[wsAgg]);
 
   var commonMonths=useMemo(function(){
-    /* Use all Vaahan months — WS fallback handles months beyond last WS month */
     var vMos=new Set();VHN_ROWS.forEach(function(r){if(r.month)vMos.add(r.month);});
     return Array.from(vMos).filter(function(m){return moKey(m)>0;}).sort(function(a,b){return moKey(b)-moKey(a);});
   },[]);
@@ -534,62 +602,127 @@ function RetailEngineTab(){
 
   var mosSorted=useMemo(function(){return commonMonths.slice().sort(function(a,b){return moKey(a)-moKey(b);});},[commonMonths]);
 
-  function predictCell(st,model,mo){
-    var stateRetail=(vhnAgg[st]||{})[mo]||0;
-    var modelWS=(wsAgg[model]||{})[mo]||0;
-    var totalWS=moTotalWS[mo]||0;
-    /* Fallback: if no WS for this month, use most recent month that has WS data */
-    if(!totalWS){
-      var moIdx0=mosSorted.indexOf(mo);
-      for(var fi=moIdx0-1;fi>=0;fi--){
-        var fm=mosSorted[fi];
-        if(moTotalWS[fm]>0){modelWS=(wsAgg[model]||{})[fm]||0;totalWS=moTotalWS[fm];break;}
-      }
-    }
-    var base=stateRetail*(modelWS/(totalWS||1));
-    if(!base)return 0;
-    var moIdx=mosSorted.indexOf(mo);
-    /* 6-month window for state momentum; 3-month for faster-moving signals */
-    var prev6=moIdx>=6?mosSorted.slice(moIdx-6,moIdx):mosSorted.slice(0,Math.max(0,moIdx));
-    var prev3=moIdx>=3?mosSorted.slice(moIdx-3,moIdx):mosSorted.slice(0,Math.max(0,moIdx));
-    /* Signal 1 — State Momentum [40%]: 6-month avg smooths spike sensitivity */
-    var avgSR=prev6.length?prev6.reduce(function(s,m){return s+((vhnAgg[st]||{})[m]||0);},0)/prev6.length:stateRetail;
-    var stateSig=clamp01(avgSR>0?(stateRetail/avgSR-0.5)/1.5:0.5);
-    /* Signal 2 — Organic Demand [30%]: neutral 0.5 when no lead history */
-    var genNow=(orgAgg[mo]||{})[model]||0;
-    var avgGen=prev3.length?prev3.reduce(function(s,m){return s+((orgAgg[m]||{})[model]||0);},0)/prev3.length:genNow;
-    var orgSig=avgGen>0?clamp01((genNow/avgGen-0.5)/1.5):0.5;
-    /* Signal 3 — WS Share trend [20%]: share vs avg-share (decoupled from volume) */
-    var curShare=modelWS/totalWS;
-    var avgShare=prev3.length?prev3.reduce(function(s,m){var tw=moTotalWS[m]||1;return s+((wsAgg[model]||{})[m]||0)/tw;},0)/prev3.length:curShare;
-    var wsSig=clamp01(avgShare>0?(curShare/avgShare-0.5)/1.5:0.5);
-    /* Signal 4 — Seasonality [10%] */
-    var moNum=MN.indexOf(mo.split("'")[0]);
-    var sameHist=mosSorted.filter(function(m){return MN.indexOf(m.split("'")[0])===moNum&&m!==mo;});
-    var avgSame=sameHist.length?sameHist.reduce(function(s,m){return s+((vhnAgg[st]||{})[m]||0);},0)/sameHist.length:stateRetail;
-    var ovAvg=mosSorted.reduce(function(s,m){return s+((vhnAgg[st]||{})[m]||0);},0)/Math.max(mosSorted.length,1);
-    var seasSig=clamp01(ovAvg>0?(avgSame/ovAvg-0.6)/1.2:0.5);
-    var combined=0.40*stateSig+0.30*orgSig+0.20*wsSig+0.10*seasSig;
-    /* Discount: floor raised 0.88→0.93 (+5%), ceiling 0.97→1.00 — ~5% variance reduction */
-    return Math.max(0,Math.round(base*(0.93+combined*0.07)));
-  }
-
   /* ── Filtered states/models per dropdowns ── */
   var visStates=useMemo(function(){return selState==='All'?allStates:[selState];},[selState,allStates]);
   var visModels=useMemo(function(){return selModel==='All'?allModels:[selModel];},[selModel,allModels]);
 
-  /* ── Prediction tree: statePredTree[state][model][month] ── */
+  /* ── Prediction tree: statePredTree[state][model][month]
+   *  Formula: Prediction(m,s,t) = VAHAN(s,t) × RawWeight(m,s,t) / Σ_models RawWeight
+   *  RawWeight = (0.30×Wm + 0.33×Ws + 0.20×Supply + 0.17×Momentum) × Qm
+   *  Σ Prediction = VAHAN exactly (largest-remainder integer allocation).
+   * ── */
   var statePredTree=useMemo(function(){
     var o={};
+    /* Process months chronologically so prediction(t-1) is available for momentum(t) */
+    var filtMosChrono=filtMos.slice().sort(function(a,b){return moKey(a)-moKey(b);});
+
     visStates.forEach(function(st){
       o[st]={};
-      visModels.forEach(function(mod){
-        o[st][mod]={};
-        filtMos.forEach(function(mo){o[st][mod][mo]=predictCell(st,mod,mo);});
+      visModels.forEach(function(mod){o[st][mod]={};});
+
+      var prevPred=null; /* {mod: allocated} from previous month, null until first month computed */
+      var prevVahan=0;
+
+      filtMosChrono.forEach(function(mo){
+        var vahan=(vhnAgg[st]||{})[mo]||0;
+        var moIdx=mosSorted.indexOf(mo);
+        var prev6=moIdx>=6?mosSorted.slice(moIdx-6,moIdx):mosSorted.slice(0,Math.max(0,moIdx));
+        var prev3=moIdx>=3?mosSorted.slice(moIdx-3,moIdx):mosSorted.slice(0,Math.max(0,moIdx));
+
+        /* WS fallback month */
+        var wsMo=mo;
+        if(!(moTotalWS[mo]>0)){
+          for(var fi=moIdx-1;fi>=0;fi--){if(moTotalWS[mosSorted[fi]]>0){wsMo=mosSorted[fi];break;}}
+        }
+        var totalWS=moTotalWS[wsMo]||1;
+
+        /* Step 4 — StateGrowth component (shared across models): 6-month avg normalized to [0,1] */
+        var avgSR=prev6.length?prev6.reduce(function(s,m){return s+((vhnAgg[st]||{})[m]||0);},0)/prev6.length:vahan;
+        var stateGrowth=clamp01(avgSR>0?(vahan/avgSR-0.5)/1.5:0.5);
+
+        /* Step 3 — State Supply: SIAM OEM state share for this quarter */
+        var q=moToQuarter(mo);
+        var stSW=(swAgg[st]||{})[q]||0;
+        var totalSW=swTotalByQ[q]||0;
+        var stateSupply=totalSW>0?stSW/totalSW:0;
+
+        /* Step 5 — Fleet-level conversion rate for dynamic Qm (needs ≥3 months history) */
+        var fleetRetail6=prev6.reduce(function(s,pm){
+          return s+Object.keys(wsAgg).reduce(function(ss,m){return ss+((wsAgg[m]||{})[pm]||0);},0);
+        },0);
+        var fleetOrg6=prev6.reduce(function(s,pm){
+          return s+Object.keys(orgAgg[pm]||{}).reduce(function(ss,m){return ss+((orgAgg[pm]||{})[m]||0);},0);
+        },0);
+        var fleetConv=(fleetOrg6>0&&prev6.length>=3)?fleetRetail6/fleetOrg6:0;
+
+        /* Compute raw weight per model */
+        var raws={};var sumRaw=0;
+        visModels.forEach(function(mod){
+          /* Step 1 — Wm: model WS share */
+          var modelWS=(wsAgg[mod]||{})[wsMo]||0;
+          var Wm=modelWS/totalWS;
+
+          /* Step 2 — Ws: lead affinity (3-month organic trend) */
+          var genNow=(orgAgg[mo]||{})[mod]||0;
+          var avgGen=prev3.length?prev3.reduce(function(s,m){return s+((orgAgg[m]||{})[mod]||0);},0)/prev3.length:genNow;
+          var Ws=avgGen>0?clamp01((genNow/avgGen-0.5)/1.5):0.5;
+
+          /* Step 3 — Supply: state SIAM share × model WS share */
+          var Supply=stateSupply*Wm;
+
+          /* Step 4 — Hybrid Momentum: 0.6×ModelShareLag + 0.4×StateGrowth
+           *  ModelShareLag = Prediction(m,s,t-1) / Vahan(s,t-1)  [model's lagged share]
+           *  Fallback to StateGrowth only when no prior prediction exists.           */
+          var momentum;
+          if(prevPred!==null&&prevVahan>0){
+            var modelShareLag=clamp01((prevPred[mod]||0)/prevVahan);
+            momentum=clamp01(0.6*modelShareLag+0.4*stateGrowth);
+          } else {
+            momentum=stateGrowth;
+          }
+
+          /* Step 5 — Qm: dynamic lead quality */
+          var staticQm=getStaticQm(mod);
+          var Qm=staticQm;
+          if(fleetConv>0&&prev6.length>=3){
+            var modelRetail6=prev6.reduce(function(s,pm){return s+((wsAgg[mod]||{})[pm]||0);},0);
+            var modelOrg6=prev6.reduce(function(s,pm){return s+((orgAgg[pm]||{})[mod]||0);},0);
+            var modelConv=modelOrg6>0?modelRetail6/modelOrg6:fleetConv;
+            Qm=Math.min(2.0,Math.max(0.4,staticQm*(modelConv/fleetConv)));
+          }
+
+          var raw=(0.30*Wm+0.33*Ws+0.20*Supply+0.17*momentum)*Qm;
+          raws[mod]=raw;sumRaw+=raw;
+        });
+
+        /* Step 8 — Normalize: distribute VAHAN exactly (largest-remainder rounding) */
+        var allocated={};
+        if(sumRaw>0&&vahan>0){
+          var fracs=[];var floorSum=0;
+          visModels.forEach(function(mod){
+            var exact=vahan*raws[mod]/sumRaw;
+            var fl=Math.floor(exact);
+            floorSum+=fl;
+            fracs.push({mod:mod,fl:fl,rem:exact-fl});
+          });
+          var leftover=vahan-floorSum;
+          fracs.sort(function(a,b){return b.rem-a.rem;});
+          fracs.forEach(function(f,i){
+            var v=f.fl+(i<leftover?1:0);
+            o[st][f.mod][mo]=v;
+            allocated[f.mod]=v;
+          });
+        } else {
+          visModels.forEach(function(mod){o[st][mod][mo]=0;allocated[mod]=0;});
+        }
+
+        /* Carry forward for next month's ModelShareLag */
+        prevPred=allocated;
+        prevVahan=vahan;
       });
     });
     return o;
-  },[visStates,visModels,filtMos,vhnAgg,wsAgg,moTotalWS,mosSorted,orgAgg]);
+  },[visStates,visModels,filtMos,vhnAgg,wsAgg,moTotalWS,mosSorted,orgAgg,swAgg,swTotalByQ]);
 
   /* groups for TreeGrid */
   var predGroups=useMemo(function(){
@@ -608,15 +741,17 @@ function RetailEngineTab(){
 
   var predCols=useMemo(function(){return filtMos.map(function(mo){return{id:mo,label:mo};});},[filtMos]);
 
-  /* ── Pan-India (ALL) predictions for accuracy & charts ── */
+  /* ── Pan-India predictions: aggregate statePredTree across all visStates ── */
   var panPredByModel=useMemo(function(){
     var out={};
     visModels.forEach(function(mod){
       out[mod]={};
-      filtMos.forEach(function(mo){out[mod][mo]=predictCell('__ALL__',mod,mo);});
+      filtMos.forEach(function(mo){
+        out[mod][mo]=visStates.reduce(function(s,st){return s+((statePredTree[st]&&statePredTree[st][mod]&&statePredTree[st][mod][mo])||0);},0);
+      });
     });
     return out;
-  },[visModels,filtMos,vhnAgg,wsAgg,moTotalWS,mosSorted,orgAgg]);
+  },[visModels,filtMos,visStates,statePredTree]);
 
   var accRows=useMemo(function(){
     var st=selState==='All'?'__ALL__':selState;
@@ -718,11 +853,12 @@ function RetailEngineTab(){
     /* ── Signals ── */
     ce('div',{className:'signal-row'},
       ce('span',{style:{fontWeight:600,color:'#374151'}},'Signals:'),
-      ce('span',{className:'sig-item'},ce('span',{className:'sig-dot',style:{background:'#2563eb'}}),ce('b',null,'40%'),' State Momentum (6m)'),
-      ce('span',{className:'sig-item'},ce('span',{className:'sig-dot',style:{background:'#16a34a'}}),ce('b',null,'30%'),' Organic Demand'),
-      ce('span',{className:'sig-item'},ce('span',{className:'sig-dot',style:{background:'#d97706'}}),ce('b',null,'20%'),' WS Share Trend'),
-      ce('span',{className:'sig-item'},ce('span',{className:'sig-dot',style:{background:'#7c3aed'}}),ce('b',null,'10%'),' Seasonality'),
-      ce('span',{style:{color:'#94a3b8',fontSize:10.5}},'| Discount 0.93–1.00 · variance reduced –5%')
+      ce('span',{className:'sig-item'},ce('span',{className:'sig-dot',style:{background:'#2563eb'}}),ce('b',null,'30%'),' WS Share (Wm)'),
+      ce('span',{className:'sig-item'},ce('span',{className:'sig-dot',style:{background:'#16a34a'}}),ce('b',null,'33%'),' Lead Affinity (Ws)'),
+      ce('span',{className:'sig-item'},ce('span',{className:'sig-dot',style:{background:'#f59e0b'}}),ce('b',null,'20%'),' State Supply (SIAM)'),
+      ce('span',{className:'sig-item'},ce('span',{className:'sig-dot',style:{background:'#7c3aed'}}),ce('b',null,'17%'),' Momentum (6m)'),
+      ce('span',{className:'sig-item'},ce('span',{className:'sig-dot',style:{background:'#0ea5e9'}}),ce('b',null,'×Qm'),' Lead Quality'),
+      ce('span',{style:{color:'#94a3b8',fontSize:10.5}},'| Σ Prediction = VAHAN exactly · zero allocation error')
     ),
 
     /* ── KPIs ── */
@@ -812,7 +948,7 @@ function RetailEngineTab(){
         ce(ExportBtn,{onClick:doExportPredGrid})
       ),
       ce('div',{style:{fontSize:11,color:'#94a3b8',marginBottom:10}},
-        'Click a state row to expand/collapse models. State row = sum of model predictions for that state. Discount 0.93–1.00 (v1.1 accuracy uplift).'),
+        'Click a state row to expand/collapse models. State row = VAHAN actual for that state (allocation error = 0). Signals: WS Share 30% · Lead Affinity 33% · SIAM Supply 20% · Momentum 17% × Lead Quality.'),
       ce(TreeGrid,{groups:predGroups,cols:predCols,footerLabel:'State / Model',initExpanded:false})
     ),
 
@@ -862,13 +998,149 @@ function RetailEngineTab(){
 }
 
 /* ══════════════════════════════════════════════════════════════════
+ *  TAB 5 — SIAM STATE WHOLESALE
+ * ══════════════════════════════════════════════════════════════════ */
+function SiamStateWsTab(){
+  var[selQ,setSelQ]=useState('All');
+  var[selSt,setSelSt]=useState('All');
+
+  var allQs=useMemo(function(){
+    var s=new Set();MRE_STATE_WS.forEach(function(d){s.add(d.q);});
+    return Array.from(s).sort();
+  },[]);
+
+  var allSts=useMemo(function(){
+    var s=new Set();MRE_STATE_WS.forEach(function(d){s.add(d.st);});
+    return Array.from(s).sort();
+  },[]);
+
+  var filtRows=useMemo(function(){
+    return MRE_STATE_WS.filter(function(d){
+      return (selQ==='All'||d.q===selQ)&&(selSt==='All'||d.st===selSt);
+    });
+  },[selQ,selSt]);
+
+  /* pivot: rows=states, cols=quarters */
+  var visQs=useMemo(function(){
+    return selQ==='All'?allQs:[selQ];
+  },[selQ,allQs]);
+
+  var visSts=useMemo(function(){
+    return selSt==='All'?allSts:[selSt];
+  },[selSt,allSts]);
+
+  var pivot=useMemo(function(){
+    var o={};
+    filtRows.forEach(function(d){
+      if(!o[d.st])o[d.st]={};
+      o[d.st][d.q]=(o[d.st][d.q]||0)+d.ws;
+    });
+    return o;
+  },[filtRows]);
+
+  var qTotals=useMemo(function(){
+    var o={};
+    visQs.forEach(function(q){
+      o[q]=visSts.reduce(function(s,st){return s+((pivot[st]||{})[q]||0);},0);
+    });
+    return o;
+  },[visQs,visSts,pivot]);
+
+  var grandTotal=visQs.reduce(function(s,q){return s+(qTotals[q]||0);},0);
+
+  function doExport(){
+    var header=['State',...visQs,'Total'];
+    var rows=[header];
+    visSts.forEach(function(st){
+      var stTotal=visQs.reduce(function(s,q){return s+((pivot[st]||{})[q]||0);},0);
+      if(!stTotal)return;
+      rows.push([st,...visQs.map(function(q){return(pivot[st]||{})[q]||0;}),stTotal]);
+    });
+    rows.push(['Total',...visQs.map(function(q){return qTotals[q]||0;}),grandTotal]);
+    downloadCSV('SIAM_StateWS_'+new Date().toISOString().slice(0,10)+'.csv',rows);
+  }
+
+  return ce('div',{className:'fade-up'},
+
+    ce('div',{className:'card',style:{padding:'12px 16px'}},
+      ce('div',{className:'filter-row',style:{gap:12}},
+        ce('span',{className:'filter-label'},'Filters'),
+        ce(FilterSel,{label:'Quarter',value:selQ,onChange:setSelQ,
+          options:[{value:'All',label:'All Quarters'},...allQs.map(function(q){return{value:q,label:q};})]}),
+        ce(FilterSel,{label:'State',value:selSt,onChange:setSelSt,
+          options:[{value:'All',label:'All States'},...allSts.map(function(s){return{value:s,label:s};})]}),
+        ce('div',{style:{fontSize:11,color:'#94a3b8',marginLeft:'auto'}},
+          allQs.length+' quarters · '+allSts.length+' states · TVS OEM (Scooters+Motorcycle+Moped)')
+      )
+    ),
+
+    ce('div',{className:'kpi-grid'},
+      ce('div',{className:'kpi-card',style:{borderTopColor:'#2563eb'}},
+        ce('div',{className:'kpi-label'},'Total OEM Wholesale'),
+        ce('div',{className:'kpi-value'},Nfw(grandTotal)),
+        ce('div',{className:'kpi-sub'},selQ==='All'?'All quarters':selQ)
+      ),
+      ce('div',{className:'kpi-card',style:{borderTopColor:'#16a34a'}},
+        ce('div',{className:'kpi-label'},'States'),
+        ce('div',{className:'kpi-value'},visSts.filter(function(st){return visQs.some(function(q){return (pivot[st]||{})[q]>0;});}).length),
+        ce('div',{className:'kpi-sub'},'with non-zero wholesale')
+      ),
+      ce('div',{className:'kpi-card',style:{borderTopColor:'#d97706'}},
+        ce('div',{className:'kpi-label'},'Quarters'),
+        ce('div',{className:'kpi-value'},visQs.length),
+        ce('div',{className:'kpi-sub'},'Q1=Apr-Jun · Q2=Jul-Sep · Q3=Oct-Dec · Q4=Jan-Mar')
+      ),
+      ce('div',{className:'kpi-card',style:{borderTopColor:'#7c3aed'}},
+        ce('div',{className:'kpi-label'},'Avg per Quarter'),
+        ce('div',{className:'kpi-value'},visQs.length?Nfw(Math.round(grandTotal/visQs.length)):'-'),
+        ce('div',{className:'kpi-sub'},'across selected quarters')
+      )
+    ),
+
+    ce('div',{className:'card'},
+      ce('div',{className:'card-hdr'},
+        ce('div',{className:'card-title'},'State × Quarter OEM Wholesale'),
+        ce(ExportBtn,{onClick:doExport})
+      ),
+      ce('div',{className:'grid-wrap'},
+        ce('table',{className:'dg'},
+          ce('thead',null,ce('tr',null,
+            ce('th',{className:'lc'},'State'),
+            visQs.map(function(q){return ce('th',{key:q},q);}),
+            ce('th',null,'Total')
+          )),
+          ce('tbody',null,
+            visSts.map(function(st,ri){
+              var stTotal=visQs.reduce(function(s,q){return s+((pivot[st]||{})[q]||0);},0);
+              if(!stTotal)return null;
+              var bg=ri%2===0?'#fff':'#f8fafc';
+              return ce('tr',{key:st,style:{background:bg}},
+                ce('td',{className:'lc',style:{background:bg}},st),
+                visQs.map(function(q){var v=(pivot[st]||{})[q]||0;return ce('td',{key:q,style:{color:v?'inherit':'#d1d5db'}},v?Nf(v):'-');}),
+                ce('td',{style:{fontWeight:700,color:'#2563eb'}},Nf(stTotal))
+              );
+            }).filter(Boolean)
+          ),
+          ce('tfoot',null,ce('tr',null,
+            ce('td',{className:'lc'},'Total'),
+            visQs.map(function(q){return ce('td',{key:q},Nfw(qTotals[q]||0));}),
+            ce('td',null,Nfw(grandTotal))
+          ))
+        )
+      )
+    )
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════════
  *  MAIN APP
  * ══════════════════════════════════════════════════════════════════ */
 const TABS=[
-  {id:'engine',    label:'Model Retail Engine', icon:'🔮'},
-  {id:'organic',   label:'Organic Generation',  icon:'📊'},
-  {id:'vaahan',    label:'State Wise Retails',   icon:'🗺️'},
-  {id:'wholesale', label:'Model Wise Wholesale', icon:'📦'},
+  {id:'engine',    label:'Model Retail Engine',   icon:'🔮'},
+  {id:'organic',   label:'Organic Generation',    icon:'📊'},
+  {id:'vaahan',    label:'State Wise Retails',    icon:'🗺️'},
+  {id:'wholesale', label:'Model Wise Wholesale',  icon:'📦'},
+  {id:'siamws',    label:'SIAM State Wholesale',  icon:'🏭'},
 ];
 
 function App(){
@@ -878,6 +1150,7 @@ function App(){
     if(tab==='organic')   return ce(OrganicGenTab,null);
     if(tab==='vaahan')    return ce(VaahanRetailTab,null);
     if(tab==='wholesale') return ce(WholesaleTab,null);
+    if(tab==='siamws')    return ce(SiamStateWsTab,null);
     return null;
   }
   return ce('div',null,
@@ -891,7 +1164,7 @@ function App(){
       ),
       ce('div',{style:{display:'flex',alignItems:'center',gap:10}},
         ce('div',{className:'badge tag-green'},'✓ All Signals Active'),
-        ce('div',{className:'badge tag-amber'},"HMSI Vaahan Apr'24–May'26 · WS Apr'23–Mar'26"),
+        ce('div',{className:'badge tag-amber'},"TVS Vaahan · WS · SIAM State WS Q1FY25–Q4FY26"),
         ce('div',{style:{fontSize:11,color:'#6b7280'}},'React 18 · Chart.js 4')
       )
     ),
