@@ -169,16 +169,14 @@ const MANUAL_ACTIVE_MODELS=new Set([]);
 const HARD_CUTOFF={};
 (function(){
   var cuts=[
-    {m:"Pep 75-90cc",     until:"Sep'25"},
-    {m:"Pep Plus 75-90cc",until:"Sep'25"},
+    {m:"Pep + 75-90cc",until:"Sep'25"},
   ];
   cuts.forEach(function(c){HARD_CUTOFF[c.m]=moKey(c.until);});
 })();
 /* Fix 1 — Model lifecycle: prediction month strictly after activeUntil → RawWeight = 0.
  *  Month format matches existing moKey format e.g. "Sep'25".                    */
 const MODEL_LIFECYCLE={
-  "Pep 75-90cc":     {activeUntil:"Sep'25"},
-  "Pep Plus 75-90cc":{activeUntil:"Sep'25"},
+  "Pep + 75-90cc":   {activeUntil:"Sep'25"},
   "Wego":            {activeUntil:"Dec'24"},
   "Wego 110":        {activeUntil:"Dec'24"},
 };
