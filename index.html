@@ -158,6 +158,57 @@ function getStaticQm(model){
   if(u.indexOf('RADEON')>=0||u.indexOf('SPORT')>=0)return 1.20;
   return 1.00;
 }
+/* Models that are permanently blacklisted (no signal can revive them) */
+const DISCONTINUED_MODELS=new Set([]);
+/* Models that bypass the activity gate unconditionally */
+const MANUAL_ACTIVE_MODELS=new Set([]);
+/* Hard lifecycle cutoffs — checked BEFORE isModelActive, BEFORE any signal.
+ * Key = exact model name as it appears in wsAgg / ORG_ROWS data.
+ * Value = last allowed month key (moKey result). Months STRICTLY AFTER this → raw=0.
+ * Use moKey() inline so the comparison is integer, not string, avoiding apostrophe issues. */
+const HARD_CUTOFF={};
+(function(){
+  var cuts=[
+    {m:"Pep 75-90cc",     until:"Sep'25"},
+    {m:"Pep Plus 75-90cc",until:"Sep'25"},
+  ];
+  cuts.forEach(function(c){HARD_CUTOFF[c.m]=moKey(c.until);});
+})();
+/* Fix 1 — Model lifecycle: prediction month strictly after activeUntil → RawWeight = 0.
+ *  Month format matches existing moKey format e.g. "Sep'25".                    */
+const MODEL_LIFECYCLE={
+  "Pep 75-90cc":     {activeUntil:"Sep'25"},
+  "Pep Plus 75-90cc":{activeUntil:"Sep'25"},
+  "Wego":            {activeUntil:"Dec'24"},
+  "Wego 110":        {activeUntil:"Dec'24"},
+};
+/* Fix 2 — Wholesale proxy: models whose WS is clubbed inside another bucket.
+ *  Wm and Rule-1 gate both resolve through the proxy key.                       */
+const WHOLESALE_PROXY_MAP={
+  "Wego":    "Jupiter 90-125cc",
+  "Wego 110":"Jupiter 90-125cc",
+};
+/* Active Model Gate: returns true only if the model has recent enough activity.
+ *  Rule 1 — WS (direct or proxy) in current month or any of the 3 prior months.
+ *  Rule 2 — Organic leads in both current month AND the immediately preceding month.
+ *  Rule 3 — Model is in MANUAL_ACTIVE_MODELS.
+ *  Lifecycle cutoff and DISCONTINUED_MODELS always checked first.               */
+function isModelActive(mod,mo,moIdx,mosSorted,wsAgg,orgAgg){
+  if(DISCONTINUED_MODELS.has(mod))return false;
+  /* Fix 1 — lifecycle cutoff */
+  var lc=MODEL_LIFECYCLE[mod];
+  if(lc&&lc.activeUntil&&moKey(mo)>moKey(lc.activeUntil))return false;
+  if(MANUAL_ACTIVE_MODELS.has(mod))return true;
+  /* Rule 1 — use proxy key for WS lookup if mapped */
+  var wsKey=WHOLESALE_PROXY_MAP[mod]||mod;
+  var wsStart=Math.max(0,moIdx-3);
+  var wsWindow=mosSorted.slice(wsStart,moIdx+1);
+  if(wsWindow.some(function(m){return (wsAgg[wsKey]||{})[m]>0;}))return true;
+  /* Rule 2 */
+  var prevMo=moIdx>0?mosSorted[moIdx-1]:null;
+  if((orgAgg[mo]||{})[mod]>0&&prevMo&&(orgAgg[prevMo]||{})[mod]>0)return true;
+  return false;
+}
 function mkChart(ref,id,cfg){
   var c=document.getElementById(id);if(!c)return;
   if(ref.current){try{ref.current.destroy();}catch(e){}ref.current=null;}
@@ -658,8 +709,16 @@ function RetailEngineTab(){
         /* Compute raw weight per model */
         var raws={};var sumRaw=0;
         visModels.forEach(function(mod){
-          /* Step 1 — Wm: model WS share */
-          var modelWS=(wsAgg[mod]||{})[wsMo]||0;
+          /* Hard cutoff — bypasses all signal gates. HARD_CUTOFF[mod] is pre-computed
+           * as an integer key; no string-apostrophe parsing at runtime. */
+          if(HARD_CUTOFF[mod]!==undefined&&moKey(mo)>HARD_CUTOFF[mod]){raws[mod]=0;return;}
+          /* Active Model Gate — zero out discontinued or inactive models */
+          if(!isModelActive(mod,mo,moIdx,mosSorted,wsAgg,orgAgg)){
+            raws[mod]=0;return;
+          }
+          /* Step 1 — Wm: model WS share (proxy key for clubbed-wholesale models) */
+          var wsKey=WHOLESALE_PROXY_MAP[mod]||mod;
+          var modelWS=(wsAgg[wsKey]||{})[wsMo]||0;
           var Wm=modelWS/totalWS;
 
           /* Step 2 — Ws: lead affinity (3-month organic trend) */
@@ -695,11 +754,15 @@ function RetailEngineTab(){
           raws[mod]=raw;sumRaw+=raw;
         });
 
-        /* Step 8 — Normalize: distribute VAHAN exactly (largest-remainder rounding) */
+        /* Step 8 — Normalize: distribute VAHAN exactly (largest-remainder rounding).
+         *  Only models with raws[mod]>0 enter fracs — gated models (raw=0) are
+         *  pre-zeroed and never receive remainder units.                          */
         var allocated={};
+        visModels.forEach(function(mod){allocated[mod]=0;o[st][mod][mo]=0;});
         if(sumRaw>0&&vahan>0){
           var fracs=[];var floorSum=0;
           visModels.forEach(function(mod){
+            if(!(raws[mod]>0))return; /* skip gated / zero-weight models */
             var exact=vahan*raws[mod]/sumRaw;
             var fl=Math.floor(exact);
             floorSum+=fl;
@@ -712,8 +775,6 @@ function RetailEngineTab(){
             o[st][f.mod][mo]=v;
             allocated[f.mod]=v;
           });
-        } else {
-          visModels.forEach(function(mod){o[st][mod][mo]=0;allocated[mod]=0;});
         }
 
         /* Carry forward for next month's ModelShareLag */
