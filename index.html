@@ -49,8 +49,10 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#fffff
 .dg th.lc{text-align:left;position:sticky;top:0;left:0;z-index:4;background:#F8F9FE;border-right:2px solid #EDEFF8;min-width:200px;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .dg td{border-bottom:1px solid #F4F5FB;border-right:1px solid #F4F5FB;padding:5px 10px;text-align:right;color:#374151;font-family:'Courier New',monospace;white-space:nowrap}
 .dg td.lc{text-align:left;font-family:inherit;font-weight:500;color:#1E2A4A;position:sticky;left:0;z-index:1;background:#fff;border-right:2px solid #EDEFF8;min-width:200px;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.dg tr:hover td{background:#F5F6FE!important}
-.dg tr:hover td.lc{background:#F5F6FE!important}
+.dg tbody tr:hover td{background:#F5F6FE!important}
+.dg tbody tr:hover td.lc{background:#F5F6FE!important}
+.dg tfoot tr:hover td{background:#283457!important}
+.dg tfoot tr:hover td.lc{background:#283457!important}
 .dg tfoot td{background:#1E2A4A!important;color:#fff;font-weight:700;border-color:#2D3A63;position:sticky;bottom:0;z-index:2}
 .dg tfoot td.lc{background:#1E2A4A!important;position:sticky;bottom:0;left:0;z-index:3}
 .tr-state td{background:#EEF1FF!important;cursor:pointer;user-select:none}
@@ -414,7 +416,11 @@ function ModelWsTab(){
               filtMos.map(function(mo){var v=(modelWsAgg[m]&&modelWsAgg[m][mo])||0;return ce('td',{key:mo},v?Nf(v):'—');}),
               ce('td',{style:{fontWeight:700,color:'#2563eb'}},Nf(rowTot))
             );
-          }))
+          })),
+          ce('tfoot',null,ce('tr',null,ce('td',{className:'lc'},'Total'),
+            filtMos.map(function(mo){var v=filtModels.reduce(function(s,m){return s+((modelWsAgg[m]&&modelWsAgg[m][mo])||0);},0);return ce('td',{key:mo},v?Nf(v):'—');}),
+            ce('td',null,Nf(filtModels.reduce(function(s,m){return s+filtMos.reduce(function(s2,mo){return s2+((modelWsAgg[m]&&modelWsAgg[m][mo])||0);},0);},0)))
+          ))
         )
       )
     )
@@ -483,7 +489,11 @@ function StateSegWsTab(){
               );
             }):[];
             return [stateRow].concat(segRows);
-          }).filter(Boolean))
+          }).filter(Boolean)),
+          ce('tfoot',null,ce('tr',null,ce('td',{className:'lc'},'Pan India'),
+            revQs.map(function(q){var v=allStates.reduce(function(s,st){return s+rowTotal(st,q);},0);return ce('td',{key:q},v?Nf(v):'—');}),
+            ce('td',null,Nf(grandTotal))
+          ))
         )
       )
     )
@@ -569,7 +579,11 @@ function SegmentRetailTab(){
               )
             ):null;
             return [stateRow].concat(segRows).concat(tierRow?[tierRow]:[]);
-          }).filter(Boolean))
+          }).filter(Boolean)),
+          ce('tfoot',null,ce('tr',null,ce('td',{className:'lc'},'Pan India'),
+            revMos.map(function(mo){var v=allVhnSts.reduce(function(s,st){return s+((vhnAgg[st]&&vhnAgg[st][mo])||0);},0);return ce('td',{key:mo},v?Nf(v):'—');}),
+            ce('td',null,Nf(allVhnSts.reduce(function(s,st){return s+revMos.reduce(function(s2,mo){return s2+((vhnAgg[st]&&vhnAgg[st][mo])||0);},0);},0)))
+          ))
         )
       )
     )
@@ -698,7 +712,11 @@ function ModelRetailTab(){
               );
             }):[];
             return[stateRow].concat(modelRows);
-          }).filter(Boolean))
+          }).filter(Boolean)),
+          ce('tfoot',null,ce('tr',null,ce('td',{className:'lc'},'Pan India'),
+            revMos.map(function(mo){var v=allVhnSts.reduce(function(s,st){return s+((vhnAgg[st]&&vhnAgg[st][mo])||0);},0);return ce('td',{key:mo},v?Nf(v):'—');}),
+            ce('td',null,Nf(kpis.totV))
+          ))
         )
       )
     )
